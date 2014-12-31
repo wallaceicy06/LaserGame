@@ -14,7 +14,7 @@ directory. This will install all dependencies for this project.
 
 To start the webserver, execute
 
-  sails lift
+    sails lift
 
 The webpage will be accessible on port 1337 by default.
 
