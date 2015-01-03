@@ -1,10 +1,11 @@
 {
   "name": "LaserGame",
   "private": true,
-  "version": "0.0.2-2",
+  "version": "0.0.7",
   "description": "a simple websocket game for shooting people",
   "keywords": [],
   "dependencies": {
+    "connect-redis": "1.4.5",
     "ejs": "~0.8.4",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
@@ -22,7 +23,8 @@
     "rc": "~0.5.0",
     "sails": "~0.10.5",
     "sails-disk": "~0.10.0",
-    "sails-mongo": "^0.10.4"
+    "sails-mongo": "^0.10.4",
+    "sails-redis": "^0.10.3"
   },
   "scripts": {
     "start": "node app.js",
