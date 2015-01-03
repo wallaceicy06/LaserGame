@@ -7,8 +7,17 @@
 
 module.exports = {
 
-  attributes: {
+  schema: true,
 
+  attributes: {
+    locX: {type: 'integer',
+           required: true},
+    locY: {type: 'integer',
+           required: true},
+    dirX: {type: 'integer',
+           required: true},
+    dirY: {type: 'integer',
+           required: true}
   }
 };
 

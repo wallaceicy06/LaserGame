@@ -27,6 +27,7 @@ Crafty.c('Direction', {
 
   setDirection: function(x, y) {
     this.attr({dirX: x, dirY: y});
+    return this;
   },
 });
 
@@ -39,14 +40,25 @@ Crafty.c('Wall', {
 Crafty.c('Actor', {
   init: function() {
     this.requires('2D, Canvas, Grid, Solid, Direction');
+  },
+});
+
+Crafty.c('RecordId', {
+  init: function() {
+  },
+
+  id: function(recordId) {
+    this.recordId = recordId;
+    Game.entityId[recordId] = this[0];
+    return this;
   }
 });
 
 Crafty.c('Light', {
   init: function() {
-    this.requires('Actor, Color, Repeat, Collision')
+    this.requires('Actor, Color, Repeat, Collision, RecordId')
         .color('red')
-        .onHit('Solid', this.destroy)
+        .onHit('Solid', this.explode)
         .onHit('Player', function(collisions) {
           console.log(collisions);
           _.each(collisions, function(c) {
@@ -55,6 +67,11 @@ Crafty.c('Light', {
         });
 
     this.timeout(this.step, 0);
+  },
+
+  explode: function() {
+    this.destroy();
+    ServerAdapter.lightDestroyed(this.recordId);
   },
 
   step: function() {
@@ -100,9 +117,8 @@ Crafty.c('Player', {
   },
 
   shoot: function() {
-    Crafty.e('Light').at(this.x + Game.grid.tile.width * this.dirX, this.y + Game.grid.tile.height * this.dirY)
-                     .setDirection(this.dirX, this.dirY);
-    ServerAdapter.lightCreated({x: this.x, y: this.y}, {x: this.dirX, y: this.dirY});
+    ServerAdapter.lightCreated({x: this.x + Game.grid.tile.width * this.dirX, y: this.y + Game.grid.tile.height * this.dirY},
+                               {x: this.dirX, y: this.dirY});
   },
 
   stopMovement: function() {
@@ -123,6 +139,8 @@ Game = {
       height: 16
     }
   },
+
+  entityId: {},
 
   width_px: function() {
     return this.grid.width * this.grid.tile.width;
@@ -169,10 +187,12 @@ Game = {
 }
 
 GameAdapter = {
-  lightCreated: function(loc, dir) {
-     //Crafty.e('Light').at(loc.x, loc.y)
-                      //.setDirection(dir.x, dir.y);
-     Crafty.e('Light').at(loc.x, loc.y)
-                      .setDirection(dir.x, dir.y);
+  lightCreated: function(loc, dir, id) {
+    Crafty.e('Light').at(loc.x, loc.y)
+                     .setDirection(dir.x, dir.y)
+                     .id(id);
+  },
+  lightDestroyed: function(id) {
+    Crafty(Game.entityId[id]).destroy();
   }
 }

@@ -8,11 +8,12 @@ io.socket.on('connect', function() {
   io.socket.on('light', function(o) {
     switch(o.verb) {
       case 'created':
-        console.log(o);
         GameAdapter.lightCreated({'x': o.data.locX, 'y': o.data.locY},
-                                 {'x': o.data.dirX, 'y': o.data.dirY});
+                                 {'x': o.data.dirX, 'y': o.data.dirY},
+                                 o.id);
         break;
-      default:
+      case 'destroyed':
+        GameAdapter.lightDestroyed(o.id);
         break;
     }
   });
@@ -20,7 +21,16 @@ io.socket.on('connect', function() {
 
 ServerAdapter = {
   lightCreated: function(loc, dir) {
-    io.socket.post('/light/create', {'locX': loc.x, 'locY': loc.y,
-                                     'dirX': dir.x, 'dirY': dir.y});
+    io.socket.post('/light/create',
+                   {locX: loc.x, locY: loc.y, dirX: dir.x, dirY: dir.y},
+                   function(data, jwres) {
+                     GameAdapter.lightCreated({'x': data.locX, 'y': data.locY},
+                                              {'x': data.dirX, 'y': data.dirY},
+                                              data.id);
+                   });
+  },
+
+  lightDestroyed: function(id) {
+    io.socket.delete('/light/' + id);
   }
 }

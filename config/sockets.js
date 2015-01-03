@@ -35,8 +35,9 @@ module.exports.sockets = {
   *                                                                          *
   ***************************************************************************/
   onDisconnect: function(session, socket) {
-
-    // By default: do nothing.
+    Light.destroy({creator: socket.id}, function(err) {
+      if (err) console.err(err);
+    });
   },
 
 
